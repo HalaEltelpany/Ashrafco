@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تطبيق أشرفكو للعملاء - Ashrafco Mobile App Demo</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    * { font-family: 'Cairo', sans-serif; }
+    
+    .screen-container {
+      scrollbar-width: none;
+    }
+    .screen-container::-webkit-scrollbar {
+      display: none;
+    }
+    .pulse-glow {
+      animation: pulseGlow 2s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(245, 130, 32, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(245, 130, 32, 0.8); }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen py-10 px-4 flex flex-col items-center justify-center antialiased">
+
+  <!-- TOP HEADER / PITCH CONTROLS -->
+  <div class="max-w-4xl w-full text-center mb-8">
+    <div class="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 px-4 py-1.5 rounded-full text-orange-400 font-bold text-xs mb-3">
+      <span>🚀 العرض التقديمي لتطبيق الموبايل المخصص لشركة أشرفكو</span>
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-black text-white">
+      تطبيق <span class="text-orange-500">أشرفكو الذكي</span> لخدمات وراحة العميل
+    </h1>
+    <p class="text-sm sm:text-base text-slate-400 mt-2 max-w-2xl mx-auto">
+      نموذج تفاعلي حي جاهز للعرض على مجلس الإدارة يوضح القيمة التنافسية الاستثنائية التي تفوق كل المنافسين في السوق
+    </p>
+
+    <!-- Quick Feature Jump Buttons -->
+    <div class="flex flex-wrap items-center justify-center gap-2 mt-5">
+      <button onclick="navigateScreen('home')" id="btn-home" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-orange-600 text-white shadow-lg flex items-center gap-1.5">
+        <span>🏠 الرئيسية ومتابعة الدور</span>
+      </button>
+      <button onclick="navigateScreen('dvi')" id="btn-dvi" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-1.5">
+        <span>🔍 فحص الإطارات الرقمي (DVI)</span>
+      </button>
+      <button onclick="navigateScreen('warranty')" id="btn-warranty" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-1.5">
+        <span>🛡️ كارت الضمان الإلكتروني</span>
+      </button>
+      <button onclick="navigateScreen('rescue')" id="btn-rescue" class="px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-1.5">
+        <span>🚨 خدمة الإنقاذ المتنقل</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SMARTPHONE DEVICE MOCKUP -->
+  <div class="relative w-full max-w-[390px] h-[800px] bg-black rounded-[52px] p-3.5 shadow-2xl border-[5px] border-slate-800 ring-1 ring-slate-700/50 flex flex-col justify-between overflow-hidden">
+    
+    <!-- Dynamic Island / Top Notch -->
+    <div class="absolute top-4 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-900 rounded-full z-50 flex items-center justify-between px-3">
+      <div class="w-2.5 h-2.5 rounded-full bg-slate-800"></div>
+      <div class="w-3 h-3 rounded-full bg-emerald-500/80 animate-pulse"></div>
+    </div>
+
+    <!-- Phone Screen Outer -->
+    <div class="w-full h-full bg-slate-900 rounded-[44px] overflow-hidden flex flex-col relative border border-slate-800/80 text-slate-100">
+      
+      <!-- Status Bar -->
+      <div class="pt-3 px-6 pb-2 flex justify-between items-center text-[11px] font-bold text-slate-400 z-20">
+        <span id="phoneTime">10:45</span>
+        <div class="flex items-center gap-1.5">
+          <span>5G</span>
+          <span>📶</span>
+          <span>🔋 98%</span>
+        </div>
+      </div>
+
+      <!-- App Header Bar -->
+      <div class="px-5 py-3 bg-slate-900/90 backdrop-blur border-b border-slate-800 flex items-center justify-between z-20">
+        <div class="flex items-center gap-2.5">
+          <div class="bg-white p-1 rounded-lg w-9 h-9 flex items-center justify-center shadow">
+            <img src="logo.png" alt="Ashrafco" class="h-5 object-contain" onerror="this.src='logo-dark.webp'">
+          </div>
+          <div>
+            <span class="text-[10px] text-orange-400 font-bold block leading-tight">مركز النزهة - القاهرة</span>
+            <h3 class="font-black text-sm text-white">أشرفكو للسيارات</h3>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="relative cursor-pointer p-1.5 rounded-full hover:bg-slate-800">
+            <span>🔔</span>
+            <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"></span>
+          </span>
+        </div>
+      </div>
+
+      <!-- SCROLLABLE SCREEN CONTENT BODY -->
+      <div class="flex-1 overflow-y-auto screen-container p-4 space-y-4 pb-20">
+        
+        <!-- ================================================================= -->
+        <!-- SCREEN 1: HOME & LIVE QUEUE TRACKER -->
+        <!-- ================================================================= -->
+        <div id="screen-home" class="space-y-4">
+          
+          <!-- Car & Welcome Banner -->
+          <div class="bg-gradient-to-l from-slate-800 to-slate-800/60 p-3.5 rounded-2xl border border-slate-700/70 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-xl font-bold">
+                🚗
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block">مركبة العميل المسجلة</span>
+                <h4 class="font-bold text-xs text-white">مرسيدس C180 (س ع د 123)</h4>
+              </div>
+            </div>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">
+              بالفرع الآن
+            </span>
+          </div>
+
+          <!-- LIVE QUEUE HERO CARD (الورقة الرابحة) -->
+          <div class="bg-gradient-to-br from-slate-800 via-slate-850 to-slate-900 border-2 border-orange-500/80 rounded-3xl p-5 shadow-2xl relative overflow-hidden pulse-glow">
+            
+            <div class="flex items-center justify-between border-b border-slate-750 pb-3 mb-3">
+              <div>
+                <span class="text-[10px] font-bold text-orange-400 uppercase tracking-wider block">Smart Queue Live</span>
+                <span class="text-xs text-slate-300 font-semibold">متابعة نوبتك في الحارات</span>
+              </div>
+              <span class="inline-flex items-center gap-1 text-[10px] bg-red-600 text-white font-black px-2.5 py-0.5 rounded-full animate-pulse">
+                <span>🔴</span> مباشر الآن
+              </span>
+            </div>
+
+            <!-- Big Serving Ticket Number -->
+            <div class="text-center my-3">
+              <span class="text-[11px] text-slate-400 font-bold block mb-1">رقم تذكرتك</span>
+              <div class="text-5xl font-black text-white tracking-wider flex items-center justify-center gap-1">
+                <span class="text-orange-500">A-</span>10
+              </div>
+              <p class="text-xs text-emerald-400 font-bold mt-1">
+                ✅ جاري العمل بسيارتك الآن في: <span class="underline">حارة الترصيص</span>
+              </p>
+            </div>
+
+            <!-- Multi-Station Route Progress -->
+            <div class="space-y-2 mt-4 pt-3 border-t border-slate-750 text-xs">
+              <span class="text-[10px] font-bold text-slate-400 block mb-1">مسار الخدمات المطلوب لسيارتك:</span>
+              
+              <!-- Step 1 (Active) -->
+              <div class="bg-slate-900/90 border border-orange-500/50 p-2.5 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-6 h-6 rounded-full bg-orange-500 text-white text-[11px] font-black flex items-center justify-center animate-spin">
+                    🔄
+                  </span>
+                  <div>
+                    <span class="font-bold text-white text-xs block">1. ترصيص 4 إطارات</span>
+                    <span class="text-[10px] text-orange-400">الفني: كابتن أحمد محمود (حارة 1)</span>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-orange-500/20 text-orange-400 font-bold px-2 py-0.5 rounded">جاري</span>
+              </div>
+
+              <!-- Step 2 (Upcoming Auto) -->
+              <div class="bg-slate-900/50 border border-slate-700/50 p-2.5 rounded-xl flex items-center justify-between opacity-80">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-6 h-6 rounded-full bg-slate-700 text-slate-300 text-[11px] font-bold flex items-center justify-center">
+                    2
+                  </span>
+                  <div>
+                    <span class="font-bold text-slate-300 text-xs block">2. ضبط زوايا كمبيوتر 3D</span>
+                    <span class="text-[10px] text-slate-500">تلقائياً بعد انتهاء الترصيص</span>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-slate-800 text-slate-400 font-bold px-2 py-0.5 rounded">التالي</span>
+              </div>
+            </div>
+
+            <!-- Wait Time & Actions -->
+            <div class="mt-4 pt-3 border-t border-slate-750 flex items-center justify-between text-xs">
+              <div>
+                <span class="text-[10px] text-slate-400 block">الوقت المتبقي لانتهاء السيارة:</span>
+                <span class="font-black text-emerald-400 text-sm">~ 14 دقيقة</span>
+              </div>
+              <button onclick="alert('تم إرسال طلبك لكابتن الضيافة، قهوتك في الطريق إليك بالاستراحة ☕')" class="bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                طلب ضيافة بالصالة ☕
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Quick Service Shortcuts -->
+          <div class="grid grid-cols-2 gap-3">
+            <div onclick="navigateScreen('dvi')" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 p-3.5 rounded-2xl cursor-pointer transition">
+              <span class="text-2xl mb-1 block">🔍</span>
+              <h5 class="font-bold text-xs text-white">فحص الإطارات DVI</h5>
+              <p class="text-[10px] text-slate-400 mt-0.5">تقرير الفحص الفني بالصور</p>
+            </div>
+            <div onclick="navigateScreen('warranty')" class="bg-slate-800/80 hover:bg-slate-800 border border-slate-700 p-3.5 rounded-2xl cursor-pointer transition">
+              <span class="text-2xl mb-1 block">🛡️</span>
+              <h5 class="font-bold text-xs text-white">الضمان الإلكتروني</h5>
+              <p class="text-[10px] text-slate-400 mt-0.5">شهادات الضمان وسيريال الكاوتش</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 2: DIGITAL VEHICLE INSPECTION (DVI) فحص الإطارات الرقمي -->
+        <!-- ================================================================= -->
+        <div id="screen-dvi" class="hidden space-y-4">
+          
+          <div class="bg-slate-800 border border-slate-700 p-4 rounded-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+              <div>
+                <span class="text-[10px] text-orange-400 font-bold uppercase">Digital Vehicle Inspection</span>
+                <h3 class="font-black text-sm text-white">تقرير فحص السلامة للإطارات 4x4</h3>
+              </div>
+              <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">فحص دقيق</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2">
+              قام الفني بقياس عمق النقشة وتاريخ الإنتاج DOT لجميع إطارات سيارتك لضمان أقصى درجات الأمان على الطريق.
+            </p>
+          </div>
+
+          <!-- 4 Tires Visual Layout -->
+          <div class="space-y-3">
+            
+            <!-- Front Right -->
+            <div class="bg-slate-800/90 border-r-4 border-emerald-500 p-3.5 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 font-bold block">أمامي يمين (Front Right)</span>
+                <h5 class="font-bold text-xs text-white">بريدجستون 205/55R16</h5>
+                <span class="text-[10px] text-emerald-400 block mt-0.5">عمق النقشة: 6.8 مم (ممتاز 85%)</span>
+              </div>
+              <span class="text-xs font-bold text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-lg">سليم 🟢</span>
+            </div>
+
+            <!-- Front Left -->
+            <div class="bg-slate-800/90 border-r-4 border-emerald-500 p-3.5 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 font-bold block">أمامي يسار (Front Left)</span>
+                <h5 class="font-bold text-xs text-white">بريدجستون 205/55R16</h5>
+                <span class="text-[10px] text-emerald-400 block mt-0.5">عمق النقشة: 6.5 مم (ممتاز 82%)</span>
+              </div>
+              <span class="text-xs font-bold text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-lg">سليم 🟢</span>
+            </div>
+
+            <!-- Rear Right (Needs Attention) -->
+            <div class="bg-slate-800/90 border-r-4 border-amber-500 p-3.5 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 font-bold block">خلفي يمين (Rear Right)</span>
+                <h5 class="font-bold text-xs text-white">بريدجستون 205/55R16</h5>
+                <span class="text-[10px] text-amber-400 block mt-0.5">عمق النقشة: 3.2 مم (تنبيه: تآكل خفيف)</span>
+              </div>
+              <span class="text-xs font-bold text-amber-400 bg-amber-950 px-2.5 py-1 rounded-lg">تنبيه 🟡</span>
+            </div>
+
+            <!-- Rear Left (Danger) -->
+            <div class="bg-slate-800/90 border-r-4 border-red-500 p-3.5 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-400 font-bold block">خلفي يسار (Rear Left)</span>
+                <h5 class="font-bold text-xs text-white">بريدجستون 205/55R16</h5>
+                <span class="text-[10px] text-red-400 block mt-0.5">عمق النقشة: 1.6 مم (وجود بالونة خطرة)</span>
+              </div>
+              <span class="text-xs font-bold text-red-400 bg-red-950 px-2.5 py-1 rounded-lg">خطر 🔴</span>
+            </div>
+
+          </div>
+
+          <!-- Direct Upsell Offer -->
+          <div class="bg-gradient-to-r from-orange-600 to-red-600 p-4 rounded-2xl text-white shadow-xl">
+            <h4 class="font-black text-sm mb-1">عرض خاص لاستبدال الإطار التالف اليوم</h4>
+            <p class="text-[11px] text-orange-100 mb-3">احصل على خصم 15% على إطار بريدجستون الجديد مع تركيب ونيتروجين مجاناً الآن بالفرع قبل المغادرة.</p>
+            <button onclick="alert('تم إبلاغ الفني بتجهيز الإطار الجديد لتركيبه بسيارتك الآن!')" class="w-full bg-white text-slate-900 font-black py-2 rounded-xl text-xs shadow hover:bg-slate-100 transition">
+              موافق، ركّب الإطار الجديد الآن 🛒
+            </button>
+          </div>
+
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 3: ELECTRONIC WARRANTY كارت الضمان الإلكتروني -->
+        <!-- ================================================================= -->
+        <div id="screen-warranty" class="hidden space-y-4">
+          
+          <div class="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-orange-500/70 p-5 rounded-3xl text-white shadow-2xl relative">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <span class="text-[10px] font-bold text-orange-400 tracking-wider">OFFICIAL E-WARRANTY</span>
+                <h4 class="font-black text-lg text-white">شهادة الضمان الرقمية المعتمدة</h4>
+                <p class="text-[10px] text-slate-400">صادرة وموثقة من شركة أشرفكو للتجارة والتوزيع</p>
+              </div>
+              <div class="bg-white p-1 rounded-lg">
+                <img src="logo.png" alt="Ashrafco" class="h-6 object-contain" onerror="this.src='logo-dark.webp'">
+              </div>
+            </div>
+
+            <div class="bg-black/40 border border-slate-700/60 rounded-xl p-3 space-y-2 text-xs mb-4">
+              <div class="flex justify-between">
+                <span class="text-slate-400">المنتج:</span>
+                <span class="font-bold text-white">طقم 4 إطارات Continental Sport</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">رقم الفاتورة في Odoo:</span>
+                <span class="font-bold text-orange-400">INV/2026/08/0491</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">تاريخ الإنتاج DOT:</span>
+                <span class="font-bold text-white">الأسبوع 22 سنة 2026</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">فترة الضمان:</span>
+                <span class="font-bold text-emerald-400">ساري حتى أغسطس 2029 (3 سنوات)</span>
+              </div>
+            </div>
+
+            <div class="text-center pt-2 border-t border-slate-700 flex flex-col items-center justify-center">
+              <div class="bg-white p-2 rounded-xl text-3xl text-slate-900 inline-block mb-1">
+                🏁
+              </div>
+              <span class="text-[10px] text-slate-400">سيريال التوثيق: ASH-99281-EGY</span>
+              <span class="text-[9px] text-emerald-400 font-bold mt-0.5">✓ معتمد ضد عيوب الصناعة في كافة الفروع</span>
+            </div>
+          </div>
+
+          <!-- Free Perks with Warranty -->
+          <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3.5 space-y-2 text-xs">
+            <h5 class="font-bold text-white text-xs">مزايا مجانية مستحقة مع ضمانك:</h5>
+            <div class="flex items-center justify-between text-slate-300 text-[11px] py-1 border-b border-slate-700/50">
+              <span>• تزويد نيتروجين مجاني طوال فترة الضمان</span>
+              <span class="text-emerald-400 font-bold">متاح دائماً</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-300 text-[11px] py-1 border-b border-slate-700/50">
+              <span>• تدوير إطارات مجاني كل 10,000 كم</span>
+              <span class="text-orange-400 font-bold">باقي 3,200 كم</span>
+            </div>
+            <div class="flex items-center justify-between text-slate-300 text-[11px] py-1">
+              <span>• خصم 25% على ضبط الزوايا</span>
+              <span class="text-emerald-400 font-bold">مفعل</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- SCREEN 4: ROADSIDE RESCUE خدمة الإنقاذ المتنقل والبطاريات -->
+        <!-- ================================================================= -->
+        <div id="screen-rescue" class="hidden space-y-4">
+          
+          <div class="bg-gradient-to-r from-red-600 to-orange-600 p-4 rounded-2xl text-white">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">🚨</span>
+              <div>
+                <h4 class="font-black text-sm">خدمة إنقاذ أشرفكو السريعة</h4>
+                <p class="text-[11px] text-orange-100">كاوتش نايم أو بطارية خلصت؟ نصلك أينما كنت بسيارة الخدمة المتنقلة.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <label class="block text-xs font-bold text-slate-300">اختر نوع المساعدة الطارئة:</label>
+            
+            <div onclick="selectRescueType(this)" class="rescue-opt p-3.5 bg-slate-800 border-2 border-orange-500 rounded-xl cursor-pointer flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">🔋</span>
+                <div>
+                  <h5 class="font-bold text-xs text-white">تغيير أو توصيل بطارية</h5>
+                  <span class="text-[10px] text-slate-400 block">فحص وتركيب بطارية كلورايد أو فارتا أصلية</span>
+                </div>
+              </div>
+              <span class="text-xs text-orange-400 font-bold">متوفر فوراً</span>
+            </div>
+
+            <div onclick="selectRescueType(this)" class="rescue-opt p-3.5 bg-slate-800/80 border border-slate-700 rounded-xl cursor-pointer flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">🛞</span>
+                <div>
+                  <h5 class="font-bold text-xs text-white">علاج بنشر / تركيب الاستبن</h5>
+                  <span class="text-[10px] text-slate-400 block">لحام سريع أو تبديل بالإطار الاحتياطي</span>
+                </div>
+              </div>
+              <span class="text-xs text-slate-400 font-bold">متوفر</span>
+            </div>
+          </div>
+
+          <!-- GPS Location Simulation -->
+          <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-3 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-red-400 text-base">📍</span>
+              <div>
+                <span class="text-[10px] text-slate-400 block">موقعك الحالي المحدد بالـ GPS:</span>
+                <span class="font-bold text-white text-xs">مصر الجديدة - شارع الثورة</span>
+              </div>
+            </div>
+            <span class="text-[10px] bg-slate-700 text-slate-300 px-2 py-1 rounded">تعديل</span>
+          </div>
+
+          <button onclick="alert('تم توجيه أقرب سيارة إنقاذ تابعة لأشرفكو لموقعك! وقت الوصول التقديري: 18 دقيقة.')" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-3 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 transition active:scale-95">
+            <span>🚨</span>
+            <span>طلب سيارة الإنقاذ الآن لموقعي</span>
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- Phone Bottom Navigation Bar -->
+      <div class="absolute bottom-0 inset-x-0 bg-slate-950/95 border-t border-slate-800/90 px-4 py-2.5 flex justify-around items-center z-30">
+        <button onclick="navigateScreen('home')" class="nav-item flex flex-col items-center text-orange-500 font-bold" id="nav-home">
+          <span class="text-lg leading-none">🏠</span>
+          <span class="text-[9px] mt-1">الرئيسية</span>
+        </button>
+        <button onclick="navigateScreen('dvi')" class="nav-item flex flex-col items-center text-slate-400 hover:text-white" id="nav-dvi">
+          <span class="text-lg leading-none">🔍</span>
+          <span class="text-[9px] mt-1">فحص DVI</span>
+        </button>
+        <button onclick="navigateScreen('warranty')" class="nav-item flex flex-col items-center text-slate-400 hover:text-white" id="nav-warranty">
+          <span class="text-lg leading-none">🛡️</span>
+          <span class="text-[9px] mt-1">الضمان</span>
+        </button>
+        <button onclick="navigateScreen('rescue')" class="nav-item flex flex-col items-center text-slate-400 hover:text-white" id="nav-rescue">
+          <span class="text-lg leading-none">🚨</span>
+          <span class="text-[9px] mt-1">إنقاذ</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INTERACTION SCRIPT -->
+  <script>
+    function navigateScreen(screenId) {
+      ['home', 'dvi', 'warranty', 'rescue'].forEach(id => {
+        const el = document.getElementById(`screen-${id}`);
+        const btn = document.getElementById(`btn-${id}`);
+        const nav = document.getElementById(`nav-${id}`);
+        
+        if (id === screenId) {
+          el.classList.remove('hidden');
+          if (btn) {
+            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-orange-600 text-white shadow-lg flex items-center gap-1.5';
+          }
+          if (nav) {
+            nav.className = 'nav-item flex flex-col items-center text-orange-500 font-bold';
+          }
+        } else {
+          el.classList.add('hidden');
+          if (btn) {
+            btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-1.5';
+          }
+          if (nav) {
+            nav.className = 'nav-item flex flex-col items-center text-slate-400 hover:text-white';
+          }
+        }
+      });
+    }
+
+    function selectRescueType(element) {
+      document.querySelectorAll('.rescue-opt').forEach(opt => {
+        opt.className = 'rescue-opt p-3.5 bg-slate-800/80 border border-slate-700 rounded-xl cursor-pointer flex items-center justify-between';
+      });
+      element.className = 'rescue-opt p-3.5 bg-slate-800 border-2 border-orange-500 rounded-xl cursor-pointer flex items-center justify-between';
+    }
+
+    // Phone Clock
+    setInterval(() => {
+      const now = new Date();
+      const el = document.getElementById('phoneTime');
+      if (el) el.innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    }, 1000);
+  </script>
+
+</body>
+</html>

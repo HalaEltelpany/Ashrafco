@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام أشرفكو الذكي لإدارة الدور - Ashrafco Smart Queue</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    * { font-family: 'Cairo', sans-serif; }
+    
+    .pulse-call {
+      animation: pulse 1.2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(227, 6, 19, 0.4); }
+      50% { transform: scale(1.03); box-shadow: 0 0 0 15px rgba(227, 6, 19, 0); }
+    }
+
+    .ticket-paper {
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+      border-top: 6px dashed #f58220;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-orange-500 selection:text-white">
+
+  <!-- TOP APP BAR / BRANDING -->
+  <header class="bg-black/90 border-b border-orange-500/30 sticky top-0 z-50 backdrop-blur px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <div class="bg-white rounded-lg px-3 py-1.5 shadow-md flex items-center">
+        <img src="logo.png" alt="Ashrafco Logo" class="h-8 object-contain" onerror="this.src='logo-dark.webp'">
+      </div>
+      <div>
+        <h1 class="text-xl font-black tracking-wide text-white flex items-center gap-2">
+          <span>نظام إدارة الدور الذكي</span>
+          <span class="text-xs bg-gradient-to-r from-orange-500 to-red-600 text-white px-2 py-0.5 rounded-full font-bold">PRO</span>
+        </h1>
+        <p class="text-xs text-slate-400">محاكاة تفاعلية شاملة لمراكز خدمات إطارات وسيارات أشرفكو</p>
+      </div>
+    </div>
+
+    <!-- VIEW SWITCHER TABS -->
+    <div class="flex items-center gap-1.5 bg-slate-800/90 p-1.5 rounded-xl border border-slate-700">
+      <button onclick="switchTab('kiosk')" id="tab-kiosk" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-orange-600 text-white shadow-lg">
+        <span>1. كشك التذاكر (Kiosk)</span>
+      </button>
+      <button onclick="switchTab('terminal')" id="tab-terminal" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span>2. شاشة الصنايعي (Terminal)</span>
+      </button>
+      <button onclick="switchTab('tv')" id="tab-tv" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span>3. شاشة العرض الرئيسية (TV)</span>
+      </button>
+      <button onclick="switchTab('customer')" id="tab-customer" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700">
+        <span>4. تطبيق الموبايل للعميل</span>
+      </button>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        متصل لحظياً (WebSocket)
+      </span>
+      <button onclick="resetDemo()" title="إعادة تعيين البيانات الافتراضية" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition text-sm">
+        🔄 إعادة ضبط
+      </button>
+    </div>
+  </header>
+
+  <!-- NOTIFICATION BANNER (AUDIO/CALL EVENT) -->
+  <div id="callNotification" class="hidden bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-3 shadow-xl transition-all flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl animate-bounce">📢</span>
+      <div>
+        <span class="text-sm font-light">نداء صوتي لخدمة العميل:</span>
+        <span class="text-xl font-black mr-2 tracking-wider" id="callNotificationText">تذكرة #A-10 إلى محطة الترصيص</span>
+      </div>
+    </div>
+    <span class="text-xs bg-black/30 px-3 py-1 rounded-full">تنبيه بالصالة والشاشات</span>
+  </div>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 1: KIOSK (إصدار التذاكر) -->
+    <!-- ========================================================================= -->
+    <section id="view-kiosk" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Kiosk Touch Screen Form -->
+        <div class="lg:col-span-7 bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-2xl backdrop-blur">
+          <div class="border-b border-slate-700 pb-4 mb-6 flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-orange-400 uppercase tracking-wider">Kiosk Touch Unit</span>
+              <h2 class="text-2xl font-black text-white mt-1">واجهة إصدار التذاكر والاستقبال</h2>
+              <p class="text-sm text-slate-400">حدد الخدمات المطلوبة للسيارة ورقم الهاتف لإصدار التذكرة</p>
+            </div>
+            <div class="text-orange-500 bg-orange-500/10 p-3 rounded-xl text-3xl">
+              👆
+            </div>
+          </div>
+
+          <form id="kioskForm" onsubmit="event.preventDefault(); issueTicket();" class="space-y-6">
+            <div>
+              <label class="block text-sm font-bold text-slate-300 mb-3">اختر الخدمات المطلوبة (يمكن اختيار أكثر من خدمة):</label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="serviceOptions">
+                <!-- Services checkboxes rendered dynamically -->
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div>
+                <label class="block text-sm font-bold text-slate-300 mb-2">رقم هاتف العميل (اختياري للإشعار SMS):</label>
+                <div class="relative">
+                  <input type="tel" id="customerPhone" placeholder="010XXXXXXXX" dir="ltr"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-slate-300 mb-2">رقم لوحة السيارة (لتسهيل الاستدعاء):</label>
+                <div class="relative">
+                  <input type="text" id="carPlate" placeholder="مثال: س ع د 1 2 3"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black py-4 rounded-xl shadow-xl flex items-center justify-center gap-3 text-lg transition-all active:scale-95">
+              <span>🖨️</span>
+              <span>طباعة وإصدار التذكرة الرقمية</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Ticket Preview & Thermal Printer Mock -->
+        <div class="lg:col-span-5 flex flex-col items-center justify-center">
+          <div class="w-full max-w-sm">
+            <div class="text-xs font-bold text-slate-400 text-center mb-2 flex items-center justify-center gap-2">
+              <span>🧾</span>
+              <span>معاينة التذكرة المطبوعة (Thermal Printer Mock)</span>
+            </div>
+
+            <div id="ticketPreviewCard" class="ticket-paper rounded-2xl p-6 text-slate-900 transition-all duration-300">
+              <!-- Ticket Header -->
+              <div class="text-center pb-4 border-b border-dashed border-slate-300">
+                <img src="logo.png" alt="Ashrafco" class="h-9 mx-auto object-contain mb-2" onerror="this.src='logo-dark.webp'">
+                <h3 class="font-black text-lg text-slate-900">أشرفكو لخدمات السيارات</h3>
+                <p class="text-xs text-slate-500">مركز الخدمة السريعة المعتمد</p>
+                <div class="mt-2 text-xs font-semibold bg-orange-100 text-orange-800 py-0.5 px-3 rounded-full inline-block" id="ticketTimestamp">
+                  --/--/---- --:--
+                </div>
+              </div>
+
+              <!-- Ticket Number -->
+              <div class="text-center py-6">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">رقم التذكرة</span>
+                <span id="ticketNumberDisplay" class="text-5xl font-black text-slate-900 tracking-tight">A-10</span>
+                <div class="mt-2">
+                  <span id="ticketInitialStationBadge" class="text-xs bg-slate-900 text-white font-bold px-3 py-1 rounded-full">
+                    المحطة الأولى: الترصيص
+                  </span>
+                </div>
+              </div>
+
+              <!-- Ticket Details -->
+              <div class="border-t border-b border-dashed border-slate-300 py-3 space-y-2 text-xs">
+                <div class="flex justify-between">
+                  <span class="text-slate-500">الخدمات المطلوبة:</span>
+                  <span id="ticketServicesList" class="font-bold text-slate-800">ترصيص، ضبط زوايا</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-500">السيارة:</span>
+                  <span id="ticketPlateDisplay" class="font-bold text-slate-800">س ع د 123</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-500">الوقت المتوقع للبدء:</span>
+                  <span id="ticketEstimatedWait" class="font-bold text-emerald-600">حوالي 10 دقائق</span>
+                </div>
+              </div>
+
+              <!-- Ticket Footer / QR -->
+              <div class="text-center pt-4">
+                <div class="bg-slate-100 rounded-lg p-2.5 inline-block mb-2 border border-slate-200 text-3xl">
+                  📱
+                </div>
+                <p class="text-[11px] text-slate-500">امسح الكود لمتابعة دورك لحظة بلحظة على هاتفك</p>
+                <p class="text-[10px] text-slate-400 mt-1">شكراً لاختياركم أشرفكو - طريقك دائماً آمن</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 2: TECHNICIAN TERMINAL (شاشة الصنايعي / الفني) -->
+    <!-- ========================================================================= -->
+    <section id="view-terminal" class="hidden space-y-6">
+      
+      <!-- Station Selector Bar -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+        <div class="flex items-center gap-3">
+          <div class="bg-orange-500/20 text-orange-400 p-2.5 rounded-xl text-xl">
+            ⚙️
+          </div>
+          <div>
+            <span class="text-xs text-slate-400 font-bold uppercase">Terminal Console</span>
+            <h3 class="text-lg font-black text-white">اختر المحطة التي يعمل بها الفني الآن:</h3>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2" id="stationButtons">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Main Station Workstation Interface -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Live Station Status & Control Card -->
+        <div class="lg:col-span-8 bg-slate-800/90 border border-slate-700 rounded-2xl p-6 shadow-2xl space-y-6">
+          
+          <div class="flex items-center justify-between border-b border-slate-700 pb-4">
+            <div class="flex items-center gap-3">
+              <span id="activeStationIcon" class="w-12 h-12 rounded-xl bg-orange-600/20 text-orange-400 flex items-center justify-center text-2xl font-bold">
+                🔄
+              </span>
+              <div>
+                <span class="text-xs font-bold text-orange-400">المحطة الحالية</span>
+                <h2 id="activeStationName" class="text-2xl font-black text-white">محطة الترصيص</h2>
+              </div>
+            </div>
+            <div class="text-left">
+              <span class="text-xs text-slate-400 block">حالة الحارة</span>
+              <span id="activeStationStatus" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> جاري العمل
+              </span>
+            </div>
+          </div>
+
+          <!-- Numbers Display (الآن / التالي / عدد المنتظرين) as requested in PDF -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- NOW SERVING -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-orange-500/80 rounded-2xl p-5 text-center shadow-lg relative overflow-hidden">
+              <div class="absolute top-2 right-2 text-[10px] font-bold bg-orange-500 text-white px-2 py-0.5 rounded-full">
+                جاري الخدمة
+              </div>
+              <span class="text-sm font-bold text-slate-400 block mt-2">الآن (Serving)</span>
+              <div id="termNowTicket" class="text-5xl font-black text-orange-400 my-2 tracking-wider">A-10</div>
+              <div class="text-xs text-slate-300" id="termNowCustomerInfo">
+                س ع د 123 | عميل جديد
+              </div>
+            </div>
+
+            <!-- NEXT -->
+            <div class="bg-slate-900/80 border border-slate-700 rounded-2xl p-5 text-center shadow-lg">
+              <span class="text-sm font-bold text-slate-400 block">التالي (Next)</span>
+              <div id="termNextTicket" class="text-5xl font-black text-slate-200 my-2 tracking-wider">A-11</div>
+              <div class="text-xs text-slate-400" id="termNextCustomerInfo">
+                ق م ن 456 | عميل مكمل
+              </div>
+            </div>
+
+            <!-- WAITING COUNT -->
+            <div class="bg-slate-900/80 border border-slate-700 rounded-2xl p-5 text-center shadow-lg">
+              <span class="text-sm font-bold text-slate-400 block">عدد المنتظرين</span>
+              <div id="termWaitingCount" class="text-5xl font-black text-emerald-400 my-2">4</div>
+              <div class="text-xs text-slate-400">
+                في طابور هذه المحطة
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ACTION BUTTONS (الآزرار الأربعة المنصوص عليها في الـ PDF) -->
+          <div class="pt-2">
+            <h4 class="text-xs font-bold text-slate-400 uppercase mb-3">أزرار التحكم للـ Terminal Unit:</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              
+              <!-- NEXT -->
+              <button onclick="terminalAction('next')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 px-4 rounded-xl shadow-lg flex flex-col items-center justify-center gap-1.5 transition active:scale-95">
+                <span class="text-2xl">⏭️</span>
+                <span class="text-base font-bold">Next (التالي)</span>
+                <span class="text-[10px] opacity-80">نداء العميل التالي</span>
+              </button>
+
+              <!-- RECALL -->
+              <button onclick="terminalAction('recall')" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-4 rounded-xl shadow-lg flex flex-col items-center justify-center gap-1.5 transition active:scale-95">
+                <span class="text-2xl">🔄</span>
+                <span class="text-base font-bold">Recall (إعادة)</span>
+                <span class="text-[10px] opacity-80">إعادة النداء الصوتي</span>
+              </button>
+
+              <!-- SKIP -->
+              <button onclick="terminalAction('skip')" class="bg-amber-600 hover:bg-amber-700 text-white font-black py-4 px-4 rounded-xl shadow-lg flex flex-col items-center justify-center gap-1.5 transition active:scale-95">
+                <span class="text-2xl">⏳</span>
+                <span class="text-base font-bold">Skip (تخطي)</span>
+                <span class="text-[10px] opacity-80">تأجيل لعدم الحضور</span>
+              </button>
+
+              <!-- COMPLETE -->
+              <button onclick="terminalAction('complete')" class="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-black py-4 px-4 rounded-xl shadow-lg flex flex-col items-center justify-center gap-1.5 transition active:scale-95">
+                <span class="text-2xl">✅</span>
+                <span class="text-base font-bold">Complete (إنهاء)</span>
+                <span class="text-[10px] opacity-80">تحويل للمحطة التالية</span>
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Queue Logic Explanation Note -->
+          <div class="bg-slate-900/60 border border-slate-700/60 rounded-xl p-4 flex items-start gap-3">
+            <span class="text-orange-400 text-lg">💡</span>
+            <div class="text-xs text-slate-300 leading-relaxed">
+              <strong class="text-orange-400 font-bold block mb-0.5">منطق الدور العادل (Queue Logic) المطبق:</strong>
+              يتم إعطاء الأولوية للعملاء الجدد مع دمج عميل مكمل تلقائياً بعد كل 3 عملاء جدد لضمان عدم توقف سيارة العميل المكمل وتفادي الشكاوى.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Station Waiting Queue List -->
+        <div class="lg:col-span-4 bg-slate-800/90 border border-slate-700 rounded-2xl p-6 shadow-2xl flex flex-col h-full">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-700 mb-4">
+            <h3 class="font-bold text-white flex items-center gap-2">
+              <span>📋</span>
+              <span>طابور الانتظار الحالي</span>
+            </h3>
+            <span id="queueListBadge" class="bg-slate-700 text-slate-200 text-xs px-2.5 py-1 rounded-full font-bold">3 سيارات</span>
+          </div>
+
+          <div id="stationQueueItems" class="flex-1 overflow-y-auto space-y-2.5 max-h-[380px] pr-1">
+            <!-- Queue Cards rendered dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 3: MAIN TV SCREEN (شاشة العرض الرئيسية بالصالة 55-60 بوصة) -->
+    <!-- ========================================================================= -->
+    <section id="view-tv" class="hidden space-y-6">
+      
+      <!-- TV Header simulation -->
+      <div class="bg-black/80 border-2 border-slate-700 rounded-3xl p-6 shadow-2xl">
+        
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-6">
+          <div class="flex items-center gap-4">
+            <div class="bg-white p-2.5 rounded-xl">
+              <img src="logo.png" alt="Ashrafco" class="h-10 object-contain" onerror="this.src='logo-dark.webp'">
+            </div>
+            <div>
+              <h2 class="text-3xl font-black text-white">لوحة عرض ومتابعة الخدمات</h2>
+              <p class="text-sm text-orange-400 font-semibold">مرحباً بكم في مركز أشرفكو - يرجى متابعة رقم تذكرتك والمحطة</p>
+            </div>
+          </div>
+          <div class="text-left flex items-center gap-4">
+            <div class="bg-slate-900 border border-slate-800 px-4 py-2 rounded-2xl">
+              <div class="text-xs text-slate-400">التوقيت الحالي</div>
+              <div class="text-xl font-black text-white" id="liveClock">10:30 PM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stations Grid on Main TV Screen -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="tvStationsGrid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- TV Footer / Ticker -->
+        <div class="mt-8 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
+            <span>عند ظهور رقمك، يرجى التوجه بسيارتك مباشرة إلى الحارة المخصصة</span>
+          </div>
+          <div class="font-bold text-orange-400">
+            أشرفكو: إطارات - جنوط - بطاريات - صيانة سريعة
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 4: CUSTOMER MOBILE APP (موبايل ابليكيشن العميل) -->
+    <!-- ========================================================================= -->
+    <section id="view-customer" class="hidden space-y-6">
+      
+      <div class="max-w-md mx-auto">
+        
+        <!-- Smartphone Container -->
+        <div class="bg-black rounded-[45px] p-3 shadow-2xl border-4 border-slate-700 relative">
+          
+          <!-- Screen Notch / Speaker -->
+          <div class="w-32 h-5 bg-slate-900 rounded-b-2xl mx-auto mb-2 flex items-center justify-center">
+            <div class="w-10 h-1.5 bg-slate-700 rounded-full"></div>
+          </div>
+
+          <!-- Mobile App Screen Content -->
+          <div class="bg-slate-900 rounded-[35px] overflow-hidden border border-slate-800 text-slate-100 min-h-[640px] flex flex-col">
+            
+            <!-- Mobile App Header -->
+            <div class="bg-gradient-to-r from-orange-600 to-red-600 p-5 text-white">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs bg-black/30 px-3 py-1 rounded-full font-bold">تطبيق أشرفكو للعملاء</span>
+                <span>🔔</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="bg-white p-1.5 rounded-lg w-12 h-12 flex items-center justify-center">
+                  <img src="logo.png" alt="Ashrafco" class="h-6 object-contain" onerror="this.src='logo-dark.webp'">
+                </div>
+                <div>
+                  <h3 class="font-black text-lg">متابعة الدور المباشر</h3>
+                  <p class="text-xs text-orange-100">رقم اللوحة: <span id="appCarPlate" class="font-bold text-white">س ع د 123</span></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Body Content -->
+            <div class="p-5 flex-1 space-y-5">
+              
+              <!-- Ticket Live Status Banner -->
+              <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 text-center shadow-lg">
+                <span class="text-xs text-slate-400 font-bold block mb-1">رقم تذكرتك</span>
+                <div class="text-4xl font-black text-orange-400 mb-1" id="appTicketNum">A-10</div>
+                <div id="appCurrentStatusBadge" class="inline-block bg-orange-500/20 text-orange-400 border border-orange-500/40 text-xs font-bold px-3 py-1 rounded-full">
+                  جاري خدمتك الآن في: الترصيص
+                </div>
+              </div>
+
+              <!-- Journey Progress Timeline -->
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center justify-between">
+                  <span>مسار خدمات سيارتك:</span>
+                  <span class="text-orange-400 font-bold text-[11px]">مكتمل 1 من 2</span>
+                </h4>
+
+                <div class="space-y-3" id="appJourneyTimeline">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+              <!-- Estimated Time & Assistance -->
+              <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5 flex items-center justify-between text-xs">
+                <div>
+                  <span class="text-slate-400 block">الوقت المتبقي لانتهاء كافة الخدمات:</span>
+                  <span class="font-bold text-emerald-400 text-sm">~ 18 دقيقة</span>
+                </div>
+                <button onclick="alert('تم إشعار موظف الاستقبال، سيتوجه إليك فوراً.')" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-bold">
+                  طلب مساعدة
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Mobile Bottom Nav -->
+            <div class="bg-black/90 border-t border-slate-800 p-3 flex justify-around text-xs text-slate-400">
+              <div class="text-orange-500 flex flex-col items-center">
+                <span class="text-base">📝</span>
+                <span class="text-[10px] mt-1 font-bold">طابوري</span>
+              </div>
+              <div class="flex flex-col items-center hover:text-white">
+                <span class="text-base">🏷️</span>
+                <span class="text-[10px] mt-1">العروض والمنتجات</span>
+              </div>
+              <div class="flex flex-col items-center hover:text-white">
+                <span class="text-base">📍</span>
+                <span class="text-[10px] mt-1">الفروع</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- JAVASCRIPT STATE ENGINE & QUEUE LOGIC -->
+  <script>
+    // System Data Model
+    const STATIONS = [
+      { id: 'balancing', name: 'الترصيص', icon: '🔄', serving: 'A-10', next: 'A-11', queue: ['A-12', 'A-15', 'A-17'] },
+      { id: 'rim_repair', name: 'استعدال الجنوط', icon: '🔘', serving: 'A-18', next: 'A-19', queue: ['A-20', 'A-22'] },
+      { id: 'alignment', name: 'ضبط الزوايا', icon: '📐', serving: 'A-12', next: 'A-13', queue: ['A-14', 'A-16'] },
+      { id: 'oil_change', name: 'تغيير الزيوت', icon: '🛢️', serving: 'B-04', next: 'B-05', queue: ['B-06'] }
+    ];
+
+    const SERVICES = [
+      { id: 'balancing', name: 'ترصيص الإطارات', stationId: 'balancing', icon: '🔄' },
+      { id: 'rim_repair', name: 'استعدال الجنوط', stationId: 'rim_repair', icon: '🔘' },
+      { id: 'alignment', name: 'ضبط زوايا السيارة', stationId: 'alignment', icon: '📐' },
+      { id: 'oil_change', name: 'تغيير زيوت وفلاتر', stationId: 'oil_change', icon: '🛢️' }
+    ];
+
+    let currentTicketSequence = 23;
+    let activeStationId = 'balancing';
+    let completedTicketsCount = 0;
+
+    // Initialize the prototype
+    window.addEventListener('DOMContentLoaded', () => {
+      renderKioskServices();
+      renderStationButtons();
+      renderTerminalView();
+      renderTVView();
+      renderCustomerApp();
+      updateClock();
+      setInterval(updateClock, 1000);
+    });
+
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+      const clockEl = document.getElementById('liveClock');
+      if (clockEl) clockEl.innerText = timeStr;
+      
+      const tsEl = document.getElementById('ticketTimestamp');
+      if (tsEl) {
+        const dateStr = now.toLocaleDateString('ar-EG');
+        tsEl.innerText = `${dateStr} - ${timeStr}`;
+      }
+    }
+
+    // Switch between the 4 perspectives
+    function switchTab(viewId) {
+      ['kiosk', 'terminal', 'tv', 'customer'].forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        const tabEl = document.getElementById(`tab-${v}`);
+        if (v === viewId) {
+          viewEl.classList.remove('hidden');
+          tabEl.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-orange-600 text-white shadow-lg';
+        } else {
+          viewEl.classList.add('hidden');
+          tabEl.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 text-slate-300 hover:text-white hover:bg-slate-700';
+        }
+      });
+    }
+
+    // Render Kiosk Checkboxes
+    function renderKioskServices() {
+      const container = document.getElementById('serviceOptions');
+      container.innerHTML = SERVICES.map(s => `
+        <label class="flex items-center gap-3 p-3.5 bg-slate-900/90 border border-slate-700 rounded-xl cursor-pointer hover:border-orange-500 transition">
+          <input type="checkbox" name="services" value="${s.id}" class="w-5 h-5 text-orange-600 rounded bg-slate-800 border-slate-600 focus:ring-orange-500" checked>
+          <div class="flex items-center gap-2 text-sm font-bold text-white">
+            <span>${s.icon}</span>
+            <span>${s.name}</span>
+          </div>
+        </label>
+      `).join('');
+    }
+
+    // Issue Ticket Action
+    function issueTicket() {
+      const checkedBoxes = Array.from(document.querySelectorAll('input[name="services"]:checked'));
+      if (checkedBoxes.length === 0) {
+        alert('يرجى اختيار خدمة واحدة على الأقل');
+        return;
+      }
+
+      currentTicketSequence++;
+      const ticketNum = `A-${currentTicketSequence}`;
+      const plate = document.getElementById('carPlate').value || 'س ع د 123';
+      const phone = document.getElementById('customerPhone').value || '0101203394';
+      
+      const selectedServiceNames = checkedBoxes.map(cb => {
+        const serv = SERVICES.find(s => s.id === cb.value);
+        return serv.name;
+      }).join(' + ');
+
+      const firstStationId = checkedBoxes[0].value;
+      const firstStation = STATIONS.find(s => s.id === firstStationId);
+      
+      // Add to station queue
+      if (firstStation) {
+        firstStation.queue.push(ticketNum);
+      }
+
+      // Update Preview Card
+      document.getElementById('ticketNumberDisplay').innerText = ticketNum;
+      document.getElementById('ticketPlateDisplay').innerText = plate;
+      document.getElementById('ticketServicesList').innerText = selectedServiceNames;
+      document.getElementById('ticketInitialStationBadge').innerText = `المحطة الأولى: ${firstStation ? firstStation.name : 'الصيانة'}`;
+
+      // Animation effect
+      const card = document.getElementById('ticketPreviewCard');
+      card.classList.add('pulse-call');
+      setTimeout(() => card.classList.remove('pulse-call'), 1200);
+
+      // Re-render UI components
+      renderTerminalView();
+      renderTVView();
+      showNotification(`تم إصدار تذكرة جديدة #${ticketNum} للوحة [${plate}]`);
+    }
+
+    // Render Station Buttons in Terminal
+    function renderStationButtons() {
+      const container = document.getElementById('stationButtons');
+      container.innerHTML = STATIONS.map(s => `
+        <button onclick="setActiveStation('${s.id}')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${s.id === activeStationId ? 'bg-orange-600 text-white shadow-md' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}">
+          <span>${s.icon}</span>
+          <span>${s.name}</span>
+        </button>
+      `).join('');
+    }
+
+    function setActiveStation(id) {
+      activeStationId = id;
+      renderStationButtons();
+      renderTerminalView();
+    }
+
+    // Render Terminal View
+    function renderTerminalView() {
+      const station = STATIONS.find(s => s.id === activeStationId);
+      if (!station) return;
+
+      document.getElementById('activeStationName').innerText = `محطة ${station.name}`;
+      document.getElementById('termNowTicket').innerText = station.serving || '---';
+      document.getElementById('termNextTicket').innerText = station.next || 'لا يوجد';
+      document.getElementById('termWaitingCount').innerText = station.queue.length;
+      document.getElementById('queueListBadge').innerText = `${station.queue.length} سيارات بالانتظار`;
+
+      const queueList = document.getElementById('stationQueueItems');
+      if (station.queue.length === 0) {
+        queueList.innerHTML = `
+          <div class="text-center py-10 text-slate-500 text-sm">
+            <span class="text-3xl mb-2 block">☕</span>
+            لا توجد سيارات في طابور هذه المحطة حالياً
+          </div>
+        `;
+      } else {
+        queueList.innerHTML = station.queue.map((t, idx) => `
+          <div class="p-3 bg-slate-900/90 border border-slate-700/80 rounded-xl flex items-center justify-between hover:border-orange-500/50 transition">
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center">${idx + 1}</span>
+              <div>
+                <span class="font-black text-white text-base tracking-wider">${t}</span>
+                <span class="text-[10px] text-slate-400 block">${idx % 3 === 0 && idx > 0 ? '🔄 عميل مكمل' : '✨ عميل جديد'}</span>
+              </div>
+            </div>
+            <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded">انتظار</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Terminal Control Actions: Next, Recall, Skip, Complete
+    function terminalAction(action) {
+      const station = STATIONS.find(s => s.id === activeStationId);
+      if (!station) return;
+
+      if (action === 'recall') {
+        showNotification(`إعادة نداء: التذكرة #${station.serving} يرجى التوجه إلى محطة ${station.name}`);
+        playBeep();
+      } else if (action === 'next') {
+        if (!station.next && station.queue.length === 0) {
+          alert('لا يوجد عملاء في قائمة الانتظار لهذه المحطة.');
+          return;
+        }
+        station.serving = station.next || station.queue.shift();
+        station.next = station.queue.length > 0 ? station.queue.shift() : '---';
+        showNotification(`النداء التالي: تذكرة #${station.serving} إلى محطة ${station.name}`);
+        playBeep();
+      } else if (action === 'skip') {
+        if (station.serving !== '---') {
+          showNotification(`تم تخطي وتأجيل التذكرة #${station.serving}`);
+          station.serving = station.next || '---';
+          station.next = station.queue.length > 0 ? station.queue.shift() : '---';
+        }
+      } else if (action === 'complete') {
+        completedTicketsCount++;
+        const finishedTicket = station.serving;
+        showNotification(`تم إنهاء خدمة التذكرة #${finishedTicket} في محطة ${station.name} وتحويلها تلقائياً`);
+        station.serving = station.next || '---';
+        station.next = station.queue.length > 0 ? station.queue.shift() : '---';
+      }
+
+      renderTerminalView();
+      renderTVView();
+      renderCustomerApp();
+    }
+
+    // Render TV Grid
+    function renderTVView() {
+      const container = document.getElementById('tvStationsGrid');
+      container.innerHTML = STATIONS.map(s => `
+        <div class="bg-slate-900 border-2 ${s.id === activeStationId ? 'border-orange-500' : 'border-slate-800'} rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-orange-400 text-lg">${s.icon}</span>
+              <h4 class="font-black text-lg text-white">${s.name}</h4>
+            </div>
+            <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">حارة رقم ${s.id === 'balancing' ? '1' : s.id === 'rim_repair' ? '2' : s.id === 'alignment' ? '3' : '4'}</span>
+          </div>
+
+          <div class="my-5 text-center">
+            <span class="text-xs text-slate-400 font-bold block mb-1">العميل الحالي (Now)</span>
+            <div class="text-5xl font-black text-orange-400 tracking-wider">${s.serving}</div>
+          </div>
+
+          <div class="bg-slate-950/80 rounded-xl p-3 flex items-center justify-between border border-slate-800 text-xs">
+            <span class="text-slate-400">التالي (Next):</span>
+            <span class="font-black text-white text-base">${s.next || '---'}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render Customer Mobile Journey
+    function renderCustomerApp() {
+      const timeline = document.getElementById('appJourneyTimeline');
+
+      timeline.innerHTML = `
+        <div class="bg-slate-800/90 border border-emerald-500/50 rounded-xl p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+              ✓
+            </div>
+            <div>
+              <span class="font-bold text-sm text-white">ترصيص الإطارات</span>
+              <span class="text-[10px] text-emerald-400 block">جاري العمل الآن بالحارة 1</span>
+            </div>
+          </div>
+          <span class="text-xs font-bold text-emerald-400">نشط الآن</span>
+        </div>
+
+        <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-slate-700 text-slate-400 flex items-center justify-center font-bold text-sm">
+              2
+            </div>
+            <div>
+              <span class="font-bold text-sm text-slate-300">ضبط زوايا السيارات</span>
+              <span class="text-[10px] text-slate-500 block">تلقائياً بعد انتهاء الترصيص</span>
+            </div>
+          </div>
+          <span class="text-xs text-slate-500">في الانتظار</span>
+        </div>
+      `;
+    }
+
+    function showNotification(msg) {
+      const banner = document.getElementById('callNotification');
+      const text = document.getElementById('callNotificationText');
+      text.innerText = msg;
+      banner.classList.remove('hidden');
+      setTimeout(() => banner.classList.add('hidden'), 4500);
+    }
+
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        setTimeout(() => {
+          osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+          setTimeout(() => osc.stop(), 200);
+        }, 150);
+      } catch (e) {
+        console.log('Audio API gesture needed');
+      }
+    }
+
+    function resetDemo() {
+      location.reload();
+    }
+  </script>
+
+</body>
+</html>
