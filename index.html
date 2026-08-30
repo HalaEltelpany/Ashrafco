@@ -82,6 +82,9 @@
       <button onclick="setViewMode('mobile')" id="btn-view-mobile" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
         <span>4. موبايل العميل</span>
       </button>
+      <a href="ashrafco_mobile_app_demo.html" target="_blank" title="فتح تطبيق الموبايل المستقل بتصميمه الكامل والـ DVI والضمان" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition bg-slate-800 text-orange-400 hover:bg-slate-700 flex items-center gap-1 border border-slate-700">
+        <span>📱 التطبيق الكامل (Standalone) ↗</span>
+      </a>
       <button onclick="setViewMode('pos')" id="btn-view-pos" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
         <span>5. كاشير Odoo</span>
       </button>
@@ -340,18 +343,23 @@
             <span class="text-[10px] bg-red-600 text-white font-bold px-2 py-0.5 rounded-full animate-pulse">لايف</span>
           </div>
 
-          <!-- Smartphone Shell inside Card -->
-          <div class="bg-black rounded-3xl p-3 border-2 border-slate-700 shadow-inner space-y-3">
+          <!-- Smartphone Shell inside Card (Fixed realistic phone dimensions) -->
+          <div class="max-w-[360px] mx-auto w-full bg-black rounded-[42px] p-4 border-[5px] border-slate-750 shadow-2xl space-y-3.5 relative">
             
+            <!-- Phone Speaker / Dynamic Notch -->
+            <div class="w-24 h-4 bg-slate-900 rounded-full mx-auto mb-1 flex items-center justify-center">
+              <div class="w-8 h-1 bg-slate-700 rounded-full"></div>
+            </div>
+
             <!-- Mobile App Bar -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
               <div class="flex items-center gap-2">
-                <div class="bg-white p-0.5 rounded w-6 h-6 flex items-center justify-center">
-                  <img src="logo.png" alt="Ashrafco" class="h-3.5 object-contain" onerror="this.src='logo-dark.webp'">
+                <div class="bg-white p-1 rounded-lg w-7 h-7 flex items-center justify-center shadow">
+                  <img src="logo.png" alt="Ashrafco" class="h-4 object-contain" onerror="this.src='logo-dark.webp'">
                 </div>
-                <span class="text-[11px] font-black text-white">أشرفكو سمارت</span>
+                <span class="text-xs font-black text-white">تطبيق أشرفكو سمارت</span>
               </div>
-              <span class="text-[10px] text-slate-400" id="mobileCarDisplay">س ع د 123</span>
+              <span class="text-[10px] bg-slate-800 text-slate-300 font-bold px-2 py-0.5 rounded-full" id="mobileCarDisplay">س ع د 123</span>
             </div>
 
             <!-- Active Ticket Hero -->
@@ -910,13 +918,24 @@
       if (mode === 'split') {
         panels.forEach(p => {
           document.getElementById(`panel-${p}`).classList.remove('hidden');
+          if (p === 'kiosk' || p === 'terminals' || p === 'mobile') {
+            document.getElementById(`panel-${p}`).className = 'lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col justify-between';
+          } else if (p === 'tv') {
+            document.getElementById(`panel-${p}`).className = 'lg:col-span-7 bg-black border-2 border-slate-800 rounded-2xl p-4 shadow-2xl flex flex-col justify-between';
+          } else if (p === 'pos') {
+            document.getElementById(`panel-${p}`).className = 'lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col justify-between';
+          }
         });
       } else {
         panels.forEach(p => {
           const map = { kiosk: 'kiosk', terminal: 'terminals', tv: 'tv', mobile: 'mobile', pos: 'pos' };
           if (p === map[mode]) {
             document.getElementById(`panel-${p}`).classList.remove('hidden');
-            document.getElementById(`panel-${p}`).className = 'col-span-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl';
+            if (mode === 'mobile') {
+              document.getElementById(`panel-${p}`).className = 'col-span-12 max-w-md mx-auto w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl';
+            } else {
+              document.getElementById(`panel-${p}`).className = 'col-span-12 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl';
+            }
           } else {
             document.getElementById(`panel-${p}`).classList.add('hidden');
           }
