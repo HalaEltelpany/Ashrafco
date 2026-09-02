@@ -222,7 +222,7 @@
           </div>
           <div class="py-2 text-center">
             <span class="text-[9px] text-slate-400 uppercase font-bold block">رقم الدور</span>
-            <div class="text-3xl font-black text-slate-950" id="receiptNum">A-25</div>
+            <div class="text-3xl font-black text-slate-950" id="receiptNum" dir="ltr">A-25</div>
             <div class="text-[10px] font-bold text-orange-700 mt-0.5" id="receiptRoute">
               مسار: ترصيص ⬅️ ضبط زوايا
             </div>
@@ -284,12 +284,12 @@
           <div class="grid grid-cols-3 gap-2 text-center mb-3">
             <div class="bg-slate-950 border border-orange-500/80 rounded-xl p-2">
               <span class="text-[9px] font-bold text-orange-400 block">الآن (Serving)</span>
-              <div class="text-2xl font-black text-orange-400 my-0.5" id="termNowVal">A-24</div>
+              <div class="text-2xl font-black text-orange-400 my-0.5" id="termNowVal" dir="ltr">A-24</div>
               <span class="text-[8px] text-slate-400" id="termNowPlate">ق م ن 456</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-2">
               <span class="text-[9px] font-bold text-slate-400 block">التالي (Next)</span>
-              <div class="text-2xl font-black text-white my-0.5" id="termNextVal">A-25</div>
+              <div class="text-2xl font-black text-white my-0.5" id="termNextVal" dir="ltr">A-25</div>
               <span class="text-[8px] text-slate-400" id="termNextPlate">س ع د 123</span>
             </div>
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-2">
@@ -356,15 +356,26 @@
           </div>
 
           <!-- Smartphone Shell inside Card (Fixed realistic phone dimensions) -->
-          <div class="max-w-[360px] mx-auto w-full bg-black rounded-[42px] p-4 border-[5px] border-slate-750 shadow-2xl space-y-3.5 relative">
+          <div class="max-w-[360px] mx-auto w-full bg-black rounded-[42px] p-4 border-[5px] border-slate-750 shadow-2xl space-y-3 relative overflow-hidden">
             
             <!-- Phone Speaker / Dynamic Notch -->
             <div class="w-24 h-4 bg-slate-900 rounded-full mx-auto mb-1 flex items-center justify-center">
               <div class="w-8 h-1 bg-slate-700 rounded-full"></div>
             </div>
 
+            <!-- Multi-Vehicle Selector -->
+            <div class="bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex items-center justify-between gap-1 text-[9px]">
+              <span class="text-slate-400 font-bold px-1">سياراتك:</span>
+              <button onclick="switchLiveCar('car1')" id="liveCarBtn1" class="px-2 py-1 rounded-lg bg-orange-600 text-white font-black transition">
+                🚗 مرسيدس C180 (A-25)
+              </button>
+              <button onclick="switchLiveCar('car2')" id="liveCarBtn2" class="px-2 py-1 rounded-lg bg-slate-800 text-slate-400 font-bold hover:text-white transition">
+                🚙 كيا سبورتاج (A-28)
+              </button>
+            </div>
+
             <!-- Mobile App Bar -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
               <div class="flex items-center gap-2">
                 <div class="bg-white p-1 rounded-lg w-7 h-7 flex items-center justify-center shadow">
                   <img src="logo.png" alt="Ashrafco" class="h-4 object-contain" onerror="this.src='logo-dark.webp'">
@@ -377,7 +388,7 @@
             <!-- Active Ticket Hero -->
             <div class="bg-gradient-to-br from-slate-900 to-slate-950 border border-orange-500/60 rounded-2xl p-3 text-center" id="mobileTicketCard">
               <span class="text-[10px] text-slate-400 block font-semibold">رقم تذكرتك</span>
-              <div class="text-4xl font-black text-orange-400 my-0.5" id="mobileTicketNum">A-25</div>
+              <div class="text-4xl font-black text-orange-400 my-0.5 tracking-wider" id="mobileTicketNum" dir="ltr">A-25</div>
               <div class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30 mt-1" id="mobileStatusBadge">
                 في الانتظار بالصالة
               </div>
@@ -390,7 +401,7 @@
               <div id="mobStep1" class="bg-slate-900 border border-slate-800 p-2 rounded-xl flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 text-[10px] font-bold flex items-center justify-center" id="mobStep1Icon">1</span>
-                  <span class="text-[11px] font-bold text-slate-200">ترصيص 4 إطارات</span>
+                  <span class="text-[11px] font-bold text-slate-200" id="mobStep1Text">ترصيص 4 إطارات</span>
                 </div>
                 <span class="text-[10px] text-slate-400" id="mobStep1Status">بالانتظار</span>
               </div>
@@ -398,10 +409,22 @@
               <div id="mobStep2" class="bg-slate-900 border border-slate-800 p-2 rounded-xl flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 text-[10px] font-bold flex items-center justify-center" id="mobStep2Icon">2</span>
-                  <span class="text-[11px] font-bold text-slate-200">ضبط زوايا 3D</span>
+                  <span class="text-[11px] font-bold text-slate-200" id="mobStep2Text">ضبط زوايا 3D</span>
                 </div>
                 <span class="text-[10px] text-slate-500" id="mobStep2Status">مجدول لاحقاً</span>
               </div>
+            </div>
+
+            <!-- Hospitality Cafe Trigger Button -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between text-xs">
+              <div>
+                <span class="text-[9px] text-slate-400 block">ضيافة استراحة أشرفكو:</span>
+                <span class="text-[11px] font-bold text-orange-400" id="currentDrinkOrderedText">قهوة، شاي، مشروبات</span>
+              </div>
+              <button onclick="openLiveCafeModal()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold text-[10px] px-2.5 py-1.5 rounded-lg border border-orange-500 shadow flex items-center gap-1 active:scale-95 transition">
+                <span>☕</span>
+                <span>طلب مشروب</span>
+              </button>
             </div>
 
             <!-- DVI Quick Alert in App -->
@@ -416,6 +439,61 @@
             <div id="mobWarrantyAlert" class="hidden bg-emerald-950/90 border border-emerald-500/70 p-2.5 rounded-xl text-center text-xs text-white">
               <span class="text-emerald-400 font-bold block text-[11px]">🎉 تم سداد الفاتورة وإصدار الضمان</span>
               <span class="text-[10px] text-slate-300 block">شهادة ضمان إلكترونية موثقة لمدة 3 سنوات</span>
+            </div>
+
+            <!-- LIVE CAFE MODAL INSIDE MOBILE PHONE -->
+            <div id="liveCafeModal" class="hidden absolute inset-0 bg-black/90 backdrop-blur-sm z-50 p-3 flex flex-col justify-end">
+              <div class="bg-slate-900 border-2 border-orange-500/80 rounded-2xl p-3 space-y-2.5 text-xs text-white shadow-2xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-base">☕</span>
+                    <b class="text-xs">منيو ضيافة ومشروبات الصالة</b>
+                  </div>
+                  <button onclick="closeLiveCafeModal()" class="text-slate-400 hover:text-white p-1 text-sm">✕</button>
+                </div>
+
+                <!-- Basic Drinks List -->
+                <div class="space-y-1.5 text-[11px]">
+                  <label class="p-2 bg-slate-800 rounded-lg flex items-center justify-between cursor-pointer border border-slate-700 hover:border-orange-500">
+                    <div class="flex items-center gap-2">
+                      <input type="radio" name="liveDrinkRadio" value="شاي" data-price="20" class="text-orange-500">
+                      <b class="text-white">شاي</b>
+                    </div>
+                    <span class="font-bold text-orange-400">20 ج.م</span>
+                  </label>
+                  <label class="p-2 bg-slate-800 rounded-lg flex items-center justify-between cursor-pointer border border-slate-700 hover:border-orange-500">
+                    <div class="flex items-center gap-2">
+                      <input type="radio" name="liveDrinkRadio" value="قهوة" data-price="25" checked class="text-orange-500">
+                      <b class="text-white">قهوة</b>
+                    </div>
+                    <span class="font-bold text-orange-400">25 ج.م</span>
+                  </label>
+                  <label class="p-2 bg-slate-800 rounded-lg flex items-center justify-between cursor-pointer border border-slate-700 hover:border-orange-500">
+                    <div class="flex items-center gap-2">
+                      <input type="radio" name="liveDrinkRadio" value="نسكافيه" data-price="35" class="text-orange-500">
+                      <b class="text-white">نسكافيه</b>
+                    </div>
+                    <span class="font-bold text-orange-400">35 ج.م</span>
+                  </label>
+                  <label class="p-2 bg-slate-800 rounded-lg flex items-center justify-between cursor-pointer border border-slate-700 hover:border-orange-500">
+                    <div class="flex items-center gap-2">
+                      <input type="radio" name="liveDrinkRadio" value="مياه" data-price="0" class="text-orange-500">
+                      <b class="text-white">مياه</b>
+                    </div>
+                    <span class="font-bold text-emerald-400">مجاناً 🎁</span>
+                  </label>
+                </div>
+
+                <!-- Notes Input Field -->
+                <div class="pt-1">
+                  <label class="block text-[10px] text-slate-400 font-bold mb-1">ملاحظات (اختياري):</label>
+                  <input type="text" id="liveDrinkNotes" placeholder="مثال: سكر زيادة، سادة، حليب خفيف..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500">
+                </div>
+
+                <button onclick="confirmLiveDrinkOrder()" class="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white font-black py-2 rounded-xl text-xs shadow flex items-center justify-center gap-1.5 active:scale-95 transition">
+                  <span>☕ إضافة الطلب لفاتورة Odoo POS</span>
+                </button>
+              </div>
             </div>
 
           </div>
@@ -452,11 +530,11 @@
               <span class="text-[10px] font-bold text-orange-400 block">حارة 1: الترصيص</span>
               <div class="my-2">
                 <span class="text-[9px] text-slate-400 block">الآن</span>
-                <span class="text-2xl sm:text-3xl font-black text-white tracking-wider" id="tvNow-balancing">A-24</span>
+                <span class="text-2xl sm:text-3xl font-black text-white tracking-wider" id="tvNow-balancing" dir="ltr">A-24</span>
               </div>
               <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800 text-[10px]">
                 <span class="text-slate-400">التالي: </span>
-                <b class="text-orange-400" id="tvNext-balancing">A-25</b>
+                <b class="text-orange-400" id="tvNext-balancing" dir="ltr">A-25</b>
               </div>
             </div>
 
@@ -465,11 +543,11 @@
               <span class="text-[10px] font-bold text-slate-300 block">حارة 2: ضبط الزوايا</span>
               <div class="my-2">
                 <span class="text-[9px] text-slate-400 block">الآن</span>
-                <span class="text-2xl sm:text-3xl font-black text-white tracking-wider" id="tvNow-alignment">A-18</span>
+                <span class="text-2xl sm:text-3xl font-black text-white tracking-wider" id="tvNow-alignment" dir="ltr">A-18</span>
               </div>
               <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800 text-[10px]">
                 <span class="text-slate-400">التالي: </span>
-                <b class="text-slate-300" id="tvNext-alignment">A-19</b>
+                <b class="text-slate-300" id="tvNext-alignment" dir="ltr">A-19</b>
               </div>
             </div>
 
@@ -478,11 +556,11 @@
               <span class="text-[10px] font-bold text-slate-300 block">حارة 3: استعدال الجنوط</span>
               <div class="my-2">
                 <span class="text-[9px] text-slate-400 block">الآن</span>
-                <span class="text-2xl sm:text-3xl font-black text-white tracking-wider">A-12</span>
+                <span class="text-2xl sm:text-3xl font-black text-white tracking-wider" dir="ltr">A-12</span>
               </div>
               <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800 text-[10px]">
                 <span class="text-slate-400">التالي: </span>
-                <b class="text-slate-300">A-14</b>
+                <b class="text-slate-300" dir="ltr">A-14</b>
               </div>
             </div>
 
@@ -491,11 +569,11 @@
               <span class="text-[10px] font-bold text-slate-300 block">حارة 4: تغيير الزيوت</span>
               <div class="my-2">
                 <span class="text-[9px] text-slate-400 block">الآن</span>
-                <span class="text-2xl sm:text-3xl font-black text-white tracking-wider">B-04</span>
+                <span class="text-2xl sm:text-3xl font-black text-white tracking-wider" dir="ltr">B-04</span>
               </div>
               <div class="bg-slate-950 p-1.5 rounded-lg border border-slate-800 text-[10px]">
                 <span class="text-slate-400">التالي: </span>
-                <b class="text-slate-300">B-05</b>
+                <b class="text-slate-300" dir="ltr">B-05</b>
               </div>
             </div>
 
@@ -891,6 +969,78 @@
 
     function payAndFinalizeOdoo() {
       step7_payAndWarranty();
+    }
+
+    // Multi-Car Switcher in Live Simulation
+    const liveCars = {
+      car1: {
+        plate: 'س ع د 123',
+        ticket: 'A-25',
+        status: 'في الانتظار بالصالة',
+        step1: 'ترصيص 4 إطارات',
+        step2: 'ضبط زوايا 3D'
+      },
+      car2: {
+        plate: 'ق م ن 456',
+        ticket: 'A-28',
+        status: 'في انتظار فحص الزوايا',
+        step1: 'ضبط زوايا 3D',
+        step2: 'تغيير زيوت وفلاتر'
+      }
+    };
+
+    function switchLiveCar(carKey) {
+      const c = liveCars[carKey];
+      if (!c) return;
+
+      document.getElementById('liveCarBtn1').className = carKey === 'car1'
+        ? 'px-2 py-1 rounded-lg bg-orange-600 text-white font-black transition'
+        : 'px-2 py-1 rounded-lg bg-slate-800 text-slate-400 font-bold hover:text-white transition';
+
+      document.getElementById('liveCarBtn2').className = carKey === 'car2'
+        ? 'px-2 py-1 rounded-lg bg-orange-600 text-white font-black transition'
+        : 'px-2 py-1 rounded-lg bg-slate-800 text-slate-400 font-bold hover:text-white transition';
+
+      document.getElementById('mobileCarDisplay').innerText = c.plate;
+      document.getElementById('mobileTicketNum').innerText = c.ticket;
+      document.getElementById('mobileStatusBadge').innerText = c.status;
+      document.getElementById('mobStep1Text').innerText = c.step1;
+      document.getElementById('mobStep2Text').innerText = c.step2;
+    }
+
+    function openLiveCafeModal() {
+      document.getElementById('liveCafeModal').classList.remove('hidden');
+    }
+
+    function closeLiveCafeModal() {
+      document.getElementById('liveCafeModal').classList.add('hidden');
+    }
+
+    function confirmLiveDrinkOrder() {
+      const selectedRadio = document.querySelector('input[name="liveDrinkRadio"]:checked');
+      if (!selectedRadio) return;
+      const drinkName = selectedRadio.value;
+      const price = parseInt(selectedRadio.dataset.price) || 0;
+      const notes = document.getElementById('liveDrinkNotes').value.trim();
+
+      closeLiveCafeModal();
+      const notesSnippet = notes ? ` (${notes})` : '';
+      document.getElementById('currentDrinkOrderedText').innerText = `تم طلب: ${drinkName}${notesSnippet}`;
+
+      // Add to Odoo POS Order Live
+      const posItems = document.getElementById('odooOrderItems');
+      const newRow = document.createElement('div');
+      newRow.className = 'flex justify-between text-amber-300 font-semibold bg-amber-950/40 px-1.5 py-0.5 rounded';
+      newRow.innerHTML = `<span>☕ ضيافة: ${drinkName}${notesSnippet}</span><span>${price > 0 ? price + ' ج.م' : 'مجاناً'}</span>`;
+      posItems.appendChild(newRow);
+
+      // Update POS Total
+      const currentTotal = 4250;
+      const newTotal = currentTotal + price;
+      document.getElementById('odooTotalAmount').innerText = `${newTotal.toLocaleString('ar-EG')} ج.م`;
+
+      playDingDong();
+      alert(`☕ تم إرسال طلبك: ${drinkName}${notesSnippet} للباريستا بالاستراحة، وتحديث فاتورة حسابك في Odoo POS تلقائياً بمبلغ (${price} ج.م)!`);
     }
 
     // Station dropdown switcher
