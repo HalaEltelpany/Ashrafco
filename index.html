@@ -214,7 +214,7 @@
           </div>
         </div>
 
-        <!-- Thermal Receipt Mini Mock -->
+        <!-- Thermal Receipt Mini Mock with Crisp QR Code -->
         <div id="receiptPreviewBox" class="ticket-paper rounded-xl p-3 text-slate-900 mt-3 text-xs">
           <div class="text-center pb-2 border-b border-dashed border-slate-300">
             <div class="font-black text-xs text-slate-900">أشرفكو لخدمات السيارات</div>
@@ -227,9 +227,21 @@
               مسار: ترصيص ⬅️ ضبط زوايا
             </div>
           </div>
-          <div class="border-t border-dashed border-slate-300 pt-1.5 text-[9px] flex justify-between text-slate-600">
+          <div class="border-t border-b border-dashed border-slate-300 py-1.5 text-[9px] flex justify-between text-slate-600">
             <span>لوحة: <b class="text-slate-900" id="receiptPlate">س ع د 123</b></span>
             <span>الانتظار: ~ 10 دقائق</span>
+          </div>
+
+          <!-- Crisp Scannable QR Code Section -->
+          <div class="text-center pt-2 flex flex-col items-center justify-center">
+            <div class="bg-white p-1.5 rounded-lg border border-slate-300 shadow-sm inline-block">
+              <!-- SVG QR Code Icon / Real Render -->
+              <svg class="w-16 h-16 text-slate-900" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M10,10 h30 v30 h-30 z M16,16 v18 h18 v-18 z M22,22 h6 v6 h-6 z M60,10 h30 v30 h-30 z M66,16 v18 h18 v-18 z M72,22 h6 v6 h-6 z M10,60 h30 v30 h-30 z M16,66 v18 h18 v-18 z M22,72 h6 v6 h-6 z M46,12 h8 v8 h-8 z M46,26 h8 v8 h-8 z M12,46 h8 v8 h-8 z M26,46 h8 v8 h-8 z M46,46 h8 v8 h-8 z M60,46 h8 v8 h-8 z M74,46 h8 v8 h-8 z M88,46 h4 v8 h-4 z M46,60 h8 v8 h-8 z M60,60 h8 v8 h-8 z M74,60 h8 v8 h-8 z M46,74 h8 v8 h-8 z M60,74 h8 v8 h-8 z M74,74 h8 v8 h-8 z M88,74 h4 v8 h-4 z M46,88 h8 v4 h-8 z M60,88 h8 v4 h-8 z M74,88 h8 v4 h-8 z M88,88 h4 v4 h-4 z" />
+              </svg>
+            </div>
+            <span class="text-[9px] font-bold text-slate-700 mt-1 block">امسح الكود بكاميرا الموبايل لمتابعة دورك</span>
+            <span class="text-[8px] text-slate-400">https://ashrafco.com/track?ticket=A-25</span>
           </div>
         </div>
 
@@ -490,13 +502,20 @@
           </div>
         </div>
 
-        <!-- TV Ticker -->
-        <div class="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-400">
-          <span class="flex items-center gap-1">
+        <!-- TV Ticker with QR App Download -->
+        <div class="mt-3 pt-2.5 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-400">
+          <span class="flex items-center gap-1.5 text-white font-semibold">
             <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-            يرجى التوجه بالسيارة للحارة فور ظهور رقمك على الشاشة
+            يرجى التوجه بالسيارة للحارة فور ظهور رقمك والنداء الصوتي
           </span>
-          <span class="font-bold text-orange-400">أشرفكو: طريقك دائماً آمن</span>
+          <div class="flex items-center gap-2 bg-slate-900 border border-slate-700/80 px-2.5 py-1 rounded-xl">
+            <div class="bg-white p-0.5 rounded shadow">
+              <svg class="w-5 h-5 text-black" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M10,10 h30 v30 h-30 z M16,16 v18 h18 v-18 z M22,22 h6 v6 h-6 z M60,10 h30 v30 h-30 z M66,16 v18 h18 v-18 z M72,22 h6 v6 h-6 z M10,60 h30 v30 h-30 z M16,66 v18 h18 v-18 z M22,72 h6 v6 h-6 z M46,12 h8 v8 h-8 z M46,26 h8 v8 h-8 z M12,46 h8 v8 h-8 z M26,46 h8 v8 h-8 z M46,46 h8 v8 h-8 z M60,46 h8 v8 h-8 z M74,46 h8 v8 h-8 z M88,46 h4 v8 h-4 z M46,60 h8 v8 h-8 z M60,60 h8 v8 h-8 z M74,60 h8 v8 h-8 z M46,74 h8 v8 h-8 z M60,74 h8 v8 h-8 z M74,74 h8 v8 h-8 z M88,74 h4 v8 h-4 z M46,88 h8 v4 h-8 z M60,88 h8 v4 h-8 z M74,88 h8 v4 h-8 z M88,88 h4 v4 h-4 z" />
+              </svg>
+            </div>
+            <span class="text-[9px] font-bold text-orange-400">امسح الكود لمتابعة دورك على الموبايل</span>
+          </div>
         </div>
       </div>
 
